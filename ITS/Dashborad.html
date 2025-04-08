@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inventory Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 20px;
+    }
+    .summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    .card {
+      flex: 1 1 150px;
+      background-color: #fff;
+      border-left: 8px solid;
+      padding: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      border-radius: 8px;
+    }
+    .card h2 {
+      margin: 0 0 10px;
+      font-size: 24px;
+    }
+    .card p {
+      margin: 0;
+      font-size: 18px;
+    }
+    .red { border-color: #e74c3c; }
+    .pink { border-color: #f39c12; }
+    .purple { border-color: #8e44ad; }
+    .orange { border-color: #e67e22; }
+    .green { border-color: #27ae60; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    th {
+      background-color: #f1f1f1;
+    }
+    .section-title {
+      margin-bottom: 10px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+<?php
+    $conn = new mysqli("localhost", "root", "", "InventoryTrackingSystem");
+    if ($conn->connect_error) {
+die("Connection failed: " . $conn->connect_error);
+}
+
+$summarySql = "SELECT
+(SELECT COUNT(*) FROM Products) AS total_products,
+(SELECT COUNT(*) FROM Products WHERE quantity BETWEEN 1 AND 5) AS low_stock,
+(SELECT COUNT(*) FROM Products WHERE quantity = 0) AS out_of_stock,
+(SELECT COUNT(*) FROM Products WHERE quantity = 0) AS zero_stock,
+(SELECT MAX(quantity) FROM Products) AS most_stock_quantity";
+$summaryResult = $conn->query($summarySql)->fetch_assoc();
+?>
+<div class="summary">
+  <div class="card red">
+    <h2><?= $summaryResult['total_products'] ?></h2>
+    <p>Total Products</p>
+  </div>
+  <div class="card pink">
+    <h2><?= $summaryResult['low_stock'] ?></h2>
+    <p>Low Stock Products</p>
+  </div>
+  <div class="card purple">
+    <h2><?= $summaryResult['out_of_stock'] ?></h2>
+    <p>Out of Stock Products</p>
+  </div>
+  <div class="card orange">
+    <h2><?= $summaryResult['zero_stock'] ?></h2>
+    <p>Zero Stock Product</p>
+  </div>
+  <div class="card green">
+    <h2><?= $summaryResult['most_stock_quantity'] ?></h2>
+    <p>Most Stock Product</p>
+  </div>
+</div>
+
+<?php
+    $invoices = [
+      ['2017-01-11', 'P000195', 'Mike', 1500, 10],
+      ['2017-01-09', 'P000205', 'John', 2000, 20],
+      ['2017-01-04', 'P000185', 'Emma', 1000, 20],
+      ['2017-01-01', 'P000165', 'Noel', 2500, 10],
+      ['2016-12-29', 'P000175', 'Ruby', 100, 10]
+    ];
+  ?>
+<div>
+  <div class="section-title">Recent Purchase Invoice</div>
+  <table>
+    <thead>
+    <tr>
+      <th>Purchase Date</th>
+      <th>Reference No.</th>
+      <th>Vendor Name</th>
+      <th>Order Subtotal</th>
+      <th>Other Charges Total</th>
+      <th>Order Total</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php foreach ($invoices as $inv): ?>
+    <tr>
+      <td><?= $inv[0] ?></td>
+      <td><?= $inv[1] ?></td>
+      <td><?= $inv[2] ?></td>
+      <td><?= $inv[3] ?></td>
+      <td><?= $inv[4] ?></td>
+      <td><?= $inv[3] + $inv[4] ?></td>
+    </tr>
+    <?php endforeach; ?>
+    </tbody>
+  </table>
+</div>
+
+<?php
+    $topProducts = [
+      ['509-GRPH', 'Kaplan Melton Coat Navy', 'Jackets', 50, 50],
+      ['211-CARB', 'Patch Rugger LS Shirt Taupe', 'Shirts', 10, 100],
+      ['211-CARB', 'Waffle Hood Knit Olive', 'Jackets', 15, 20],
+      ['489-RTLC', 'Red Textured Leather Cardholder', 'Card Holder', 20, 10]
+    ];
+  ?>
+<div>
+  <div class="section-title">Top 5 Purchase Product</div>
+  <table>
+    <thead>
+    <tr>
+      <th>SKU</th>
+      <th>Product Name</th>
+      <th>Category</th>
+      <th>Qty.</th>
+      <th>Price</th>
+      <th>Total</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php foreach ($topProducts as $p): ?>
+    <tr>
+      <td><?= $p[0] ?></td>
+      <td><?= $p[1] ?></td>
+      <td><?= $p[2] ?></td>
+      <td><?= $p[3] ?></td>
+      <td><?= $p[4] ?></td>
+      <td><?= $p[3] * $p[4] ?></td>
+    </tr>
+    <?php endforeach; ?>
+    </tbody>
+  </table>
+</div>
+<?php $conn->close(); ?>
+</body>
+</html>
