@@ -1,404 +1,221 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-
+  <meta name="description" content="A modern and efficient inventory tracking system to manage stock and generate reports.">
   <title>Inventory System</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #fff5eb;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
     }
+
+    .navbar-custom {
+      background-color: #343a40;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .navbar-custom .navbar-brand,
+    .navbar-custom .nav-link {
+      color: #fff;
+    }
+
     .header {
       text-align: center;
-      background: #fde0d4;
-      color: black;
-      padding: 20px;
+      background-color: #fff;
+      padding: 40px 20px;
+      border-bottom: 1px solid #ddd;
     }
+
     .header img {
-      max-width: 100px;
+      max-width: 100%;
       height: auto;
-      border-radius: 8px;
-    }
-    .slider-container {
-      position: relative;
-      width: 100%;
-      overflow: hidden;
-      background-color: #F8F9FA;
     }
 
     .slider {
-      display: flex;
+      position: relative;
+      max-width: 100%;
+      overflow: hidden;
+      margin: 20px auto;
     }
 
-    .slide {
-      flex: 0 0 auto;
+    .slider img {
       width: 100%;
-      transition: transform 0.5s ease;
+      display: none;
     }
 
-    .slide img {
-      width: 100%;
-      height: auto;
-      max-height: 400px; /* Keeps the aspect ratio */
-      object-fit: cover; /* Ensures a clean fit */
+    .slider img.active {
+      display: block;
     }
 
-    .prev, .next {
+    .slider-controls {
       position: absolute;
       top: 50%;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
       transform: translateY(-50%);
-      background-color: #333;
-      color: var(--white);
-      border: none;
-      padding: 10px 20px;
+    }
+
+    .slider-controls span {
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      padding: 10px;
       cursor: pointer;
     }
-    @media (max-width: 768px) {
-      .team-photo {
-        margin: 10px auto;
-        width: 80%;
-      }
-    }
-    .next {
-      right: 0;
-    }
-    .navbar-custom {
-      background-color: #f5deb3 !important; /* Beige */
-    }
-    .container {
-      width: 80%;
-      margin: 20px auto;
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);}
+
     .features {
       display: flex;
-      justify-content: space-around;
-      margin: 20px auto;
-      text-align: center;
-    }
-    .feature {
-      background-color: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      width: 30%;
-      display: inline-block;
-    }
-    .feature img {
-      width: 100%;
-      height: auto;
-      border-radius: 8px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    th, td {
-      padding: 10px;
-      border: 1px solid #ddd;
-      text-align: left;
-    }
-    th {
-      background: #333;
-      color: white;
-    }
-    .btn {
-      padding: 10px;
-      background: #28a745;
-      color: white;
-      border: none;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-    .btn:hover {
-      background: #218838;
-    }
-
-    section#last_match {
-      text-align: center;
-    }
-    section#last_match div {
-      display: inline-block;
-      background-color: #f0f0f0;
-      padding: 20px;
-      border-radius: 10px;
-    }
-
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgb(0,0,0);
-      background-color: rgba(0,0,0,0.4);
-    }
-
-    .modal-content {
-      background-color: #fefefe;
-      margin: 15% auto;
-      padding: 20px;
-      border: 1px solid #888;
-      width: 80%;
-    }
-
-
-    /* footer */
-    .footer {
-      background-color: #1f2937;
-      color: #f3f4f6;
-      padding: 40px 20px 20px;
-      font-family: 'Segoe UI', sans-serif;
-    }
-
-    .footer-container {
-      display: flex;
       flex-wrap: wrap;
-      justify-content: space-between;
-      gap: 40px;
-      max-width: 1200px;
-      margin: auto;
+      justify-content: center;
+      padding: 40px 10px;
+      background-color: #fff;
     }
 
-    .footer-about,
-    .footer-links,
-    .footer-contact,
-    .footer-social {
-      flex: 1 1 200px;
-    }
-
-    .footer h2, .footer h3 {
-      color: #facc15;
-    }
-
-    .footer a {
-      color: #f3f4f6;
-      text-decoration: none;
-      display: block;
-      margin-bottom: 8px;
-      transition: color 0.3s;
-    }
-
-    .footer a:hover {
-      color: #facc15;
-    }
-
-    .footer-social a {
-      display: inline-block;
-      margin-right: 10px;
-    }
-
-    .footer-social img {
-      width: 24px;
-      height: 24px;
-      filter: brightness(0) invert(1);
-      transition: transform 0.3s;
-    }
-
-    .footer-social img:hover {
-      transform: scale(1.2);
-    }
-
-    .footer-bottom {
+    .feature {
+      background: #f9f9f9;
+      margin: 15px;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      width: 300px;
       text-align: center;
-      margin-top: 30px;
-      border-top: 1px solid #374151;
-      padding-top: 15px;
-      font-size: 0.9em;
-      color: #9ca3af;
     }
 
+    .feature i {
+      color: #28a745;
+    }
 
+    .last-match {
+      background: #e9ecef;
+      padding: 40px 10px;
+      text-align: center;
+    }
+
+    .footer {
+      background: #343a40;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
   </style>
 </head>
 
 <body>
-
-
-<!-- navbar -->
-
 <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="#">
-      <img src="wmremove-transformed-removebg-preview.png" alt="Logo" width="150" height="50">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" href="#">
+      <img src="logo1.png" alt="Logo" width="120" height="30" class="d-inline-block align-top mr-2">
+      Inventory System
     </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link active" href="#">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Dashboard</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Inventory</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#" id="myBtn">Reports</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Contact</a>
-        </li>
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+        <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+        <li class="nav-item"><a class="nav-link" href="ContactUs.html">Contact</a></li>
+        <li class="nav-item"><a class="nav-link" href="Login.html">Log In</a></li>
+        <li class="nav-item"><a class="nav-link" href="register.html">Sign Up</a></li>
       </ul>
     </div>
   </div>
 </nav>
 
-
-<!-- Header -->
-<div class="header" style="background: #fff5eb; color: black;">
-
-<!--<h1>Inventory System</h1>
-  <img src="header.png" alt="Inventory Image">
--->
+<div class="header">
+  <img src="header.png" alt="Inventory Tracking">
+  <h1>Welcome to Inventory System</h1>
+  <p>Track. Manage. Optimize.</p>
+  <a href="#features" class="btn btn-success mt-3">Explore Features</a>
 </div>
 
-<div class="slider-container">
-
-    <div class="slider">
-      <div class="slide"><img src="wmremove-transformed-removebg-preview.png" alt="Slide 1"></div>
-      <div class="slide"><img src="wmremove-transformed-removebg-preview.png" alt="Slide 2"></div>
-      <div class="slide"><img src="wmremove-transformed-removebg-preview.png" alt="Slide 3"></div>
-    </div>
-
-  <button class="prev" onclick="moveSlide(-1)">Previous</button>
-  <button class="next" onclick="moveSlide(1)">Next</button>
-
+<div class="slider">
+  <img src="inventory_management_image50.webp" class="active" alt="Inventory Demo 1">
+  <img src="Inventory-Management.webp" alt="Inventory Demo 2">
+  <img src="shutterstock_2232272531.webp" alt="Inventory Demo 3">
+  <div class="slider-controls">
+    <span onclick="moveSlide(-1)">&#10094;</span>
+    <span onclick="moveSlide(1)">&#10095;</span>
+  </div>
 </div>
 
-
-
-<div class="features">
+<div id="features" class="features">
   <div class="feature">
-    <img src="inventory-vs-stock-.webp" alt="Feature 1">
-    <h3>Feature 1</h3>
-    <p>Manage stock levels efficiently.</p>
+    <i class="fas fa-box-open fa-3x mb-3"></i>
+    <h3>Real-Time Tracking</h3>
+    <p>Monitor inventory levels and movement in real-time with live updates.</p>
   </div>
   <div class="feature">
-    <img src="inventory-vs-stock-.webp" alt="Feature 2">
-    <h3>Feature 2</h3>
-    <p>Generate real-time reports and analytics.</p>
+    <i class="fas fa-chart-line fa-3x mb-3"></i>
+    <h3>Smart Analytics</h3>
+    <p>Generate insightful reports to make data-driven decisions.</p>
   </div>
   <div class="feature">
-    <img src="inventory-vs-stock-.webp" alt="Feature 3">
-    <h3>Feature 3</h3>
-    <p>Track product movements seamlessly.</p>
+    <i class="fas fa-bell fa-3x mb-3"></i>
+    <h3>Automated Alerts</h3>
+    <p>Get notified when stock runs low or items are overdue.</p>
   </div>
 </div>
 
-
-<section id="last_match" style="margin-top: 35px; margin-bottom: 35px; background-image: url(inventory-vs-stock-.webp); background-repeat: no-repeat; background-size: cover;">
-  <h2 style = "padding: 20px ">Last Match</h2>
-  <iframe style="margin-top: 20px;margin-bottom: 20px;" width="560" height="315" src="https://www.youtube.com/embed/MOG_h7PyMVQ?si=BjDchEfMOz2O8-Qx" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-</section>
-
-
-
-
-
-<!-- The Modal -->
-<div id="myModal" class="modal">
-
-  <div class="modal-content">
-    <span class="close">×</span>
-    <p style="text-align: center;">Play-book will be add soon only for player but for this time contact your coach.</p>
-    <img style="width: 30%; height: 30%; margin: auto;"  src="istockphoto-1250688024-612x612.jpg" alt="bye">
-  </div>
-
+<div class="last-match">
+  <h2>How It Works</h2>
+  <p>View our quick demo to understand how the Inventory System streamlines your stock management process.</p>
+  <button class="btn btn-success" data-toggle="modal" data-target="#playbookModal">Watch Demo</button>
 </div>
 
-
-<!-- Footer Section -->
-<footer class="footer">
-  <div class="footer-container">
-    <div class="footer-about">
-      <h2>📦 Inventory Tracking</h2>
-      <p>Smart solutions for smarter inventory. Helping businesses track, manage, and grow.</p>
-    </div>
-
-    <div class="footer-links">
-      <h3>Quick Links</h3>
-      <ul>
-        <li><a href="#">Home</a></li>
-        <li><a href="#">Features</a></li>
-        <li><a href="#">Pricing</a></li>
-        <li><a href="#">Contact</a></li>
-        <li><a href="#">Privacy Policy</a></li>
-      </ul>
-    </div>
-
-    <div class="footer-contact">
-      <h3>Contact Us</h3>
-      <p>📧 support@inventorytracking.com</p>
-      <p>📞 +1 (800) 123-4567</p>
-      <p>🕒 Mon–Fri, 9AM–5PM (CET)</p>
-    </div>
-
-    <div class="footer-social">
-      <h3>Follow Us</h3>
-      <a href="#"><img src="https://cdn-icons-png.flaticon.com/24/733/733547.png" alt="Facebook"></a>
-      <a href="#"><img src="https://cdn-icons-png.flaticon.com/24/733/733579.png" alt="Twitter"></a>
-      <a href="#"><img src="https://cdn-icons-png.flaticon.com/24/733/733561.png" alt="LinkedIn"></a>
+<div class="modal fade" id="playbookModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">System Demo</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Coming Soon:</strong> The demo will be available shortly. Stay tuned!</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
     </div>
   </div>
+</div>
 
-  <div class="footer-bottom">
-    <p>© 2025 Inventory Tracking. All rights reserved.</p>
-  </div>
-</footer>
+<div class="footer">
+  &copy; 2025 Inventory System. All rights reserved.
+</div>
 
-
-
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css">
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.7.9/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script>let slideIndex = 0;
-
-function moveSlide(n) {
-  const slides = document.getElementsByClassName("slide");
-  slideIndex += n;
-  if (slideIndex > slides.length - 1) {
-    slideIndex = 0;
-  }
-  if (slideIndex < 0) {
-    slideIndex = slides.length - 1;
-  }
-  for (let i = 0; i < slides.length; i++) {
-    slides[i].style.transform = `translateX(-${slideIndex * 100}%)`;
-  }
-}
-</script>
 <script>
-  var modal = document.getElementById("myModal");
-  var btn = document.getElementById("myBtn");
-  var span = document.getElementsByClassName("close")[0];
+  let currentIndex = 0;
+  const slides = document.querySelectorAll(".slider img");
 
-  btn.onclick = function() {
-    modal.style.display = "block";
+  function showSlide(index) {
+    slides.forEach((slide, i) => {
+      slide.classList.remove("active");
+      if (i === index) slide.classList.add("active");
+    });
   }
-  span.onclick = function() {
-    modal.style.display = "none";
+
+  function moveSlide(step) {
+    currentIndex = (currentIndex + step + slides.length) % slides.length;
+    showSlide(currentIndex);
   }
-  window.onclick = function(event) {
-    if (event.target == modal) {
-      modal.style.display = "none";
-    }
-  }
+
+  setInterval(() => moveSlide(1), 5000);
 </script>
 
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

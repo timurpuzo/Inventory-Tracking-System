@@ -1,10 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Title</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact Us | Inventory Tracking</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f9fafb;
+      color: #1f2937;
+    }
+
+    header {
+      background-color: #1f2937;
+      color: #fff;
+      padding: 20px 40px;
+      text-align: center;
+    }
+
+    .contact-container {
+      max-width: 1200px;
+      margin: auto;
+      padding: 40px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 40px;
+    }
+
+    .contact-form {
+      flex: 1 1 500px;
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .contact-form h2 {
+      margin-bottom: 20px;
+      color: #111827;
+    }
+
+    .contact-form input,
+    .contact-form textarea {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      font-size: 1em;
+    }
+
+    .contact-form textarea {
+      resize: vertical;
+      height: 150px;
+    }
+
+    .contact-form button {
+      padding: 12px 24px;
+      background-color: #facc15;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .contact-form button:hover {
+      background-color: #eab308;
+    }
+
+    .contact-info {
+      flex: 1 1 300px;
+      background-color: #1f2937;
+      color: #f9fafb;
+      padding: 30px;
+      border-radius: 12px;
+    }
+
+    .contact-info h3 {
+      margin-bottom: 20px;
+      color: #facc15;
+    }
+
+    .contact-info p {
+      margin: 10px 0;
+      line-height: 1.6;
+    }
+
+    .contact-info a {
+      color: #facc15;
+      text-decoration: none;
+    }
+
+    .map-placeholder {
+      margin-top: 30px;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .map-placeholder iframe {
+      width: 100%;
+      height: 300px;
+      border: 0;
+    }
+
+    footer {
+      background-color: #111827;
+      color: #9ca3af;
+      text-align: center;
+      padding: 20px;
+      font-size: 0.9em;
+    }
+
+    @media (max-width: 768px) {
+      .contact-container {
+        flex-direction: column;
+      }
+    }
+  </style>
 </head>
 <body>
+
+<header>
+  <h1>Contact Us</h1>
+  <p>We’re here to help. Get in touch with our team.</p>
+</header>
+
+<div class="contact-container">
+  <div class="contact-form">
+    <h2>Send Us a Message</h2>
+    <form action="#" method="POST">
+      <input type="text" name="name" placeholder="Your Name" required />
+      <input type="email" name="email" placeholder="Your Email" required />
+      <input type="text" name="subject" placeholder="Subject" />
+      <textarea name="message" placeholder="Your Message" required></textarea>
+      <button type="submit">Send Message</button>
+    </form>
+  </div>
+
+  <div class="contact-info">
+    <h3>📍 Contact Information</h3>
+    <p><strong>Email:</strong> <a href="mailto:support@inventorytracking.com">support@inventorytracking.com</a></p>
+    <p><strong>Phone:</strong> +1 (800) 123-4567</p>
+    <p><strong>Working Hours:</strong><br>Mon – Fri, 9:00 AM – 5:00 PM CET</p>
+    <p><strong>Address:</strong><br>123 Business Street, Lublin, Poland</p>
+  </div>
+</div>
+
+<div class="map-placeholder">
+  <!-- You can replace the src URL with your actual location -->
+  <iframe
+    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2443.6250830642385!2d22.572934915804693!3d51.246921379598875!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x472257bdc0d27fef%3A0x8efebce9d22b601c!2sLublin%2C%20Poland!5e0!3m2!1sen!2s!4v1615557417527!5m2!1sen!2s"
+    allowfullscreen="" loading="lazy"></iframe>
+</div>
+
+<footer>
+  &copy; 2025 Inventory Tracking. All rights reserved.
+</footer>
 
 </body>
 </html>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Inventory Dashboard</title>
   <style>
     body {
@@ -60,20 +60,26 @@
   </style>
 </head>
 <body>
+
 <?php
-    $conn = new mysqli("localhost", "root", "", "InventoryTrackingSystem");
-    if ($conn->connect_error) {
+
+$conn = new mysqli("localhost", "root", "", "inventorytrackingsystem");
+if ($conn->connect_error) {
 die("Connection failed: " . $conn->connect_error);
 }
 
-$summarySql = "SELECT
+// Summary queries
+$summarySql = "
+SELECT
 (SELECT COUNT(*) FROM Products) AS total_products,
 (SELECT COUNT(*) FROM Products WHERE quantity BETWEEN 1 AND 5) AS low_stock,
 (SELECT COUNT(*) FROM Products WHERE quantity = 0) AS out_of_stock,
 (SELECT COUNT(*) FROM Products WHERE quantity = 0) AS zero_stock,
-(SELECT MAX(quantity) FROM Products) AS most_stock_quantity";
+(SELECT MAX(quantity) FROM Products) AS most_stock_quantity
+";
 $summaryResult = $conn->query($summarySql)->fetch_assoc();
 ?>
+
 <div class="summary">
   <div class="card red">
     <h2><?= $summaryResult['total_products'] ?></h2>
@@ -89,86 +95,52 @@ $summaryResult = $conn->query($summarySql)->fetch_assoc();
   </div>
   <div class="card orange">
     <h2><?= $summaryResult['zero_stock'] ?></h2>
-    <p>Zero Stock Product</p>
+    <p>Zero Stock Products</p>
   </div>
   <div class="card green">
     <h2><?= $summaryResult['most_stock_quantity'] ?></h2>
-    <p>Most Stock Product</p>
+    <p>Most Stock Quantity</p>
   </div>
 </div>
 
-<?php
-    $invoices = [
-      ['2017-01-11', 'P000195', 'Mike', 1500, 10],
-      ['2017-01-09', 'P000205', 'John', 2000, 20],
-      ['2017-01-04', 'P000185', 'Emma', 1000, 20],
-      ['2017-01-01', 'P000165', 'Noel', 2500, 10],
-      ['2016-12-29', 'P000175', 'Ruby', 100, 10]
-    ];
-  ?>
+<!-- Placeholder for Recent Invoices -->
 <div>
   <div class="section-title">Recent Purchase Invoice</div>
+  <p>Invoices table not yet implemented in the database.</p>
+</div>
+
+<!-- Top 5 Products by Quantity -->
+<?php
+$topProducts = $conn->query("SELECT * FROM Products ORDER BY quantity DESC LIMIT 5");
+?>
+<div>
+  <div class="section-title">Top 5 Products by Stock</div>
   <table>
     <thead>
     <tr>
-      <th>Purchase Date</th>
-      <th>Reference No.</th>
-      <th>Vendor Name</th>
-      <th>Order Subtotal</th>
-      <th>Other Charges Total</th>
-      <th>Order Total</th>
+      <th>Product ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Size</th>
+      <th>Location</th>
+      <th>Quantity</th>
     </tr>
     </thead>
     <tbody>
-    <?php foreach ($invoices as $inv): ?>
+    <?php while ($p = $topProducts->fetch_assoc()): ?>
     <tr>
-      <td><?= $inv[0] ?></td>
-      <td><?= $inv[1] ?></td>
-      <td><?= $inv[2] ?></td>
-      <td><?= $inv[3] ?></td>
-      <td><?= $inv[4] ?></td>
-      <td><?= $inv[3] + $inv[4] ?></td>
+      <td><?= $p['product_id'] ?></td>
+      <td><?= $p['name'] ?></td>
+      <td><?= $p['type'] ?></td>
+      <td><?= $p['size'] ?></td>
+      <td><?= $p['location'] ?></td>
+      <td><?= $p['quantity'] ?></td>
     </tr>
-    <?php endforeach; ?>
+    <?php endwhile; ?>
     </tbody>
   </table>
 </div>
 
-<?php
-    $topProducts = [
-      ['509-GRPH', 'Kaplan Melton Coat Navy', 'Jackets', 50, 50],
-      ['211-CARB', 'Patch Rugger LS Shirt Taupe', 'Shirts', 10, 100],
-      ['211-CARB', 'Waffle Hood Knit Olive', 'Jackets', 15, 20],
-      ['489-RTLC', 'Red Textured Leather Cardholder', 'Card Holder', 20, 10]
-    ];
-  ?>
-<div>
-  <div class="section-title">Top 5 Purchase Product</div>
-  <table>
-    <thead>
-    <tr>
-      <th>SKU</th>
-      <th>Product Name</th>
-      <th>Category</th>
-      <th>Qty.</th>
-      <th>Price</th>
-      <th>Total</th>
-    </tr>
-    </thead>
-    <tbody>
-    <?php foreach ($topProducts as $p): ?>
-    <tr>
-      <td><?= $p[0] ?></td>
-      <td><?= $p[1] ?></td>
-      <td><?= $p[2] ?></td>
-      <td><?= $p[3] ?></td>
-      <td><?= $p[4] ?></td>
-      <td><?= $p[3] * $p[4] ?></td>
-    </tr>
-    <?php endforeach; ?>
-    </tbody>
-  </table>
-</div>
 <?php $conn->close(); ?>
 </body>
 </html>
