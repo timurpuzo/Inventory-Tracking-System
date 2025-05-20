@@ -57,25 +57,45 @@
       font-size: 20px;
       font-weight: bold;
     }
+
+    form {
+      margin-bottom: 20px;
+    }
+    form input {
+      padding: 8px;
+      margin-right: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    form button {
+      padding: 8px 12px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    form button:hover {
+      background-color: #2980b9;
+    }
   </style>
 </head>
 <body>
 
 <?php
 
-$conn = new mysqli("localhost", "root", "", "inventorytrackingsystem");
+$conn = new mysqli("localhost", "root", "Malek20167", "inventorytrackingsystem");
 if ($conn->connect_error) {
-die("Connection failed: " . $conn->connect_error);
+  die("Connection failed: " . $conn->connect_error);
 }
 
 // Summary queries
 $summarySql = "
 SELECT
-(SELECT COUNT(*) FROM Products) AS total_products,
-(SELECT COUNT(*) FROM Products WHERE quantity BETWEEN 1 AND 5) AS low_stock,
-(SELECT COUNT(*) FROM Products WHERE quantity = 0) AS out_of_stock,
-(SELECT COUNT(*) FROM Products WHERE quantity = 0) AS zero_stock,
-(SELECT MAX(quantity) FROM Products) AS most_stock_quantity
+  (SELECT COUNT(*) FROM Products) AS total_products,
+  (SELECT COUNT(*) FROM Products WHERE quantity BETWEEN 1 AND 5) AS low_stock,
+  (SELECT COUNT(*) FROM Products WHERE quantity = 0) AS out_of_stock,
+  (SELECT MAX(quantity) FROM Products) AS most_stock_quantity
 ";
 $summaryResult = $conn->query($summarySql)->fetch_assoc();
 ?>
@@ -93,28 +113,39 @@ $summaryResult = $conn->query($summarySql)->fetch_assoc();
     <h2><?= $summaryResult['out_of_stock'] ?></h2>
     <p>Out of Stock Products</p>
   </div>
-  <div class="card orange">
-    <h2><?= $summaryResult['zero_stock'] ?></h2>
-    <p>Zero Stock Products</p>
-  </div>
   <div class="card green">
     <h2><?= $summaryResult['most_stock_quantity'] ?></h2>
     <p>Most Stock Quantity</p>
   </div>
 </div>
 
-<!-- Placeholder for Recent Invoices -->
-<div>
-  <div class="section-title">Recent Purchase Invoice</div>
-  <p>Invoices table not yet implemented in the database.</p>
-</div>
+<!-- Search Form -->
+<form method="GET">
+  <input type="text" name="name" placeholder="Product Name" value="<?= htmlspecialchars($_GET['name'] ?? '') ?>" />
+  <input type="text" name="type" placeholder="Type" value="<?= htmlspecialchars($_GET['type'] ?? '') ?>" />
+  <input type="text" name="location" placeholder="Location" value="<?= htmlspecialchars($_GET['location'] ?? '') ?>" />
+  <button type="submit">Search</button>
+</form>
 
-<!-- Top 5 Products by Quantity -->
+<!-- Top Products Table -->
 <?php
-$topProducts = $conn->query("SELECT * FROM Products ORDER BY quantity DESC LIMIT 5");
+$name = $conn->real_escape_string(isset($_GET['name']) ? $_GET['name'] : '');
+$type = $conn->real_escape_string(isset($_GET['type']) ? $_GET['type'] : '');
+$location = $conn->real_escape_string(isset($_GET['location']) ? $_GET['location'] : '');
+
+$whereClauses = [];
+if ($name !== '') $whereClauses[] = "name LIKE '%$name%'";
+if ($type !== '') $whereClauses[] = "type LIKE '%$type%'";
+if ($location !== '') $whereClauses[] = "location LIKE '%$location%'";
+
+$whereSql = count($whereClauses) > 0 ? 'WHERE ' . implode(' AND ', $whereClauses) : '';
+
+$sql = "SELECT * FROM Products $whereSql ORDER BY quantity DESC LIMIT 10";
+$topProducts = $conn->query($sql);
 ?>
+
 <div>
-  <div class="section-title">Top 5 Products by Stock</div>
+  <div class="section-title">Top 10 Products by Stock</div>
   <table>
     <thead>
     <tr>
@@ -128,14 +159,14 @@ $topProducts = $conn->query("SELECT * FROM Products ORDER BY quantity DESC LIMIT
     </thead>
     <tbody>
     <?php while ($p = $topProducts->fetch_assoc()): ?>
-    <tr>
-      <td><?= $p['product_id'] ?></td>
-      <td><?= $p['name'] ?></td>
-      <td><?= $p['type'] ?></td>
-      <td><?= $p['size'] ?></td>
-      <td><?= $p['location'] ?></td>
-      <td><?= $p['quantity'] ?></td>
-    </tr>
+      <tr>
+        <td><?= $p['product_id'] ?></td>
+        <td><?= $p['name'] ?></td>
+        <td><?= $p['type'] ?></td>
+        <td><?= $p['size'] ?></td>
+        <td><?= $p['location'] ?></td>
+        <td><?= $p['quantity'] ?></td>
+      </tr>
     <?php endwhile; ?>
     </tbody>
   </table>
