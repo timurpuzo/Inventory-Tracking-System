@@ -64,6 +64,7 @@
     form input {
       padding: 8px;
       margin-right: 10px;
+      margin-bottom: 10px;
       border: 1px solid #ccc;
       border-radius: 4px;
     }
@@ -78,18 +79,44 @@
     form button:hover {
       background-color: #2980b9;
     }
+
+    .delete-button {
+      color: red;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
 
 <?php
-
 $conn = new mysqli("localhost", "root", "Malek20167", "inventorytrackingsystem");
 if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
-// Summary queries
+// Handle Delete
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
+  $deleteId = (int) $_POST['delete_id'];
+  $conn->query("DELETE FROM Products WHERE product_id = $deleteId");
+  header("Location: " . $_SERVER['PHP_SELF']);
+  exit;
+}
+
+// Handle Add Product
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_product'])) {
+  $name = $conn->real_escape_string($_POST['name']);
+  $type = $conn->real_escape_string($_POST['type']);
+  $size = $conn->real_escape_string($_POST['size']);
+  $location = $conn->real_escape_string($_POST['location']);
+  $quantity = (int) $_POST['quantity'];
+
+  $conn->query("INSERT INTO Products (name, type, size, location, quantity)
+                VALUES ('$name', '$type', '$size', '$location', $quantity)");
+}
+
+// Summary
 $summarySql = "
 SELECT
   (SELECT COUNT(*) FROM Products) AS total_products,
@@ -100,6 +127,7 @@ SELECT
 $summaryResult = $conn->query($summarySql)->fetch_assoc();
 ?>
 
+<!-- Dashboard Summary -->
 <div class="summary">
   <div class="card red">
     <h2><?= $summaryResult['total_products'] ?></h2>
@@ -119,6 +147,17 @@ $summaryResult = $conn->query($summarySql)->fetch_assoc();
   </div>
 </div>
 
+<!-- Add Product Form -->
+<div class="section-title">Add New Product</div>
+<form method="POST">
+  <input type="text" name="name" placeholder="Name" required />
+  <input type="text" name="type" placeholder="Type" required />
+  <input type="text" name="size" placeholder="Size" required />
+  <input type="text" name="location" placeholder="Location" required />
+  <input type="number" name="quantity" placeholder="Quantity" required />
+  <button type="submit" name="add_product">Add Product</button>
+</form>
+
 <!-- Search Form -->
 <form method="GET">
   <input type="text" name="name" placeholder="Product Name" value="<?= htmlspecialchars($_GET['name'] ?? '') ?>" />
@@ -129,9 +168,9 @@ $summaryResult = $conn->query($summarySql)->fetch_assoc();
 
 <!-- Top Products Table -->
 <?php
-$name = $conn->real_escape_string(isset($_GET['name']) ? $_GET['name'] : '');
-$type = $conn->real_escape_string(isset($_GET['type']) ? $_GET['type'] : '');
-$location = $conn->real_escape_string(isset($_GET['location']) ? $_GET['location'] : '');
+$name = $conn->real_escape_string($_GET['name'] ?? '');
+$type = $conn->real_escape_string($_GET['type'] ?? '');
+$location = $conn->real_escape_string($_GET['location'] ?? '');
 
 $whereClauses = [];
 if ($name !== '') $whereClauses[] = "name LIKE '%$name%'";
@@ -155,10 +194,50 @@ $topProducts = $conn->query($sql);
       <th>Size</th>
       <th>Location</th>
       <th>Quantity</th>
+      <th>Actions</th>
     </tr>
     </thead>
     <tbody>
     <?php while ($p = $topProducts->fetch_assoc()): ?>
+      <tr>
+        <td><?= $p['product_id'] ?></td>
+        <td><?= $p['name'] ?></td>
+        <td><?= $p['type'] ?></td>
+        <td><?= $p['size'] ?></td>
+        <td><?= $p['location'] ?></td>
+        <td><?= $p['quantity'] ?></td>
+        <td>
+          <form method="POST" onsubmit="return confirm('Delete this product?');">
+            <input type="hidden" name="delete_id" value="<?= $p['product_id'] ?>" />
+            <button type="submit" class="delete-button">Delete</button>
+          </form>
+        </td>
+      </tr>
+    <?php endwhile; ?>
+    </tbody>
+  </table>
+</div>
+
+<!-- Low Stock Table -->
+<?php
+$lowStock = $conn->query("SELECT * FROM Products WHERE quantity BETWEEN 0 AND 5 ORDER BY quantity ASC");
+?>
+
+<div>
+  <div class="section-title">Low Stock Products (Quantity 0–5)</div>
+  <table>
+    <thead>
+    <tr>
+      <th>Product ID</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Size</th>
+      <th>Location</th>
+      <th>Quantity</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php while ($p = $lowStock->fetch_assoc()): ?>
       <tr>
         <td><?= $p['product_id'] ?></td>
         <td><?= $p['name'] ?></td>
