@@ -1,9 +1,24 @@
+<?php
+session_start();
+if (!isset($_SESSION['user_id'])) {
+  header("Location: Login.html");
+  exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Inventory Dashboard</title>
+  <header class="dashboard-header">
+    <div class="user-info">
+      <h2>Welcome, <?= htmlspecialchars($_SESSION['username']) ?>!</h2>
+      <p>Your role: <?= htmlspecialchars($_SESSION['role']) ?></p>
+    </div>
+    <a href="logout.php" class="logout-button">Logout</a>
+  </header>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -11,6 +26,27 @@
       margin: 0;
       padding: 20px;
     }
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #34495e;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .dashboard-header .user-info h2 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    .dashboard-header .user-info p {
+      margin: 2px 0 0;
+      font-size: 14px;
+    }
+
     .summary {
       display: flex;
       flex-wrap: wrap;
@@ -25,6 +61,21 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
       border-radius: 8px;
     }
+    .logout-button {
+      display: inline-block;
+      padding: 8px 16px;
+      background-color: #e74c3c;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: bold;
+      transition: background-color 0.2s ease;
+    }
+
+    .logout-button:hover {
+      background-color: #c0392b;
+    }
+
     .card h2 {
       margin: 0 0 10px;
       font-size: 24px;
@@ -85,6 +136,17 @@
       background: none;
       border: none;
       cursor: pointer;
+
+      .dashboard-footer {
+        margin-top: 40px;
+        padding: 15px 20px;
+        background-color: #343a40;
+        text-align: center;
+        font-size: 14px;
+        color: #555;
+        border-radius: 8px;
+      }
+
     }
   </style>
 </head>
@@ -94,6 +156,26 @@
 $conn = new mysqli("localhost", "root", "Malek20167", "inventorytrackingsystem");
 if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
+}
+
+// Handle Add User
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_user'])) {
+  $username = $conn->real_escape_string($_POST['username']);
+  $email = $conn->real_escape_string($_POST['email']);
+  $password = $conn->real_escape_string($_POST['password']);
+  $role = 'Employee';
+
+  $stmt = $conn->prepare("INSERT INTO Users (username, email, password, role) VALUES (?, ?, ?, ?)");
+  $stmt->bind_param("ssss",  $username, $email, $password, $role);
+
+  if ($stmt->execute()) {
+    echo "<p style='color: green;'>User successfully added.</p>";
+  } else {
+    echo "<p style='color: red;'>Error adding user: " . htmlspecialchars($stmt->error) . "</p>";
+  }
+
+  $stmt->close();
 }
 
 // Handle Delete
@@ -159,6 +241,7 @@ $summaryResult = $conn->query($summarySql)->fetch_assoc();
 </form>
 
 <!-- Search Form -->
+<div class="section-title">Search For Product</div>
 <form method="GET">
   <input type="text" name="name" placeholder="Product Name" value="<?= htmlspecialchars($_GET['name'] ?? '') ?>" />
   <input type="text" name="type" placeholder="Type" value="<?= htmlspecialchars($_GET['type'] ?? '') ?>" />
@@ -250,6 +333,22 @@ $lowStock = $conn->query("SELECT * FROM Products WHERE quantity BETWEEN 0 AND 5 
     </tbody>
   </table>
 </div>
+
+<!-- Add User Form -->
+<div>
+  <div class="section-title">Add New User</div>
+  <form method="POST">
+    <input type="text" name="username" placeholder="Username" required />
+    <input type="email" name="email" placeholder="Email" required />
+    <input type="password" name="password" placeholder="Password" required />
+    <button type="submit" name="add_user">Add User</button>
+  </form>
+</div>
+
+<footer class="dashboard-footer">
+  &copy; <?= date("Y") ?> Inventory Tracking System. All rights reserved.
+</footer>
+
 
 <?php $conn->close(); ?>
 </body>
