@@ -16,6 +16,7 @@ if (!isset($_SESSION['user_id'])) {
       <h2>Welcome, <?= htmlspecialchars($_SESSION['username']) ?>!</h2>
       <p>Your role: <?= htmlspecialchars($_SESSION['role']) ?></p>
     </div>
+    <a href="main.html" class="logout-button" style="background-color: dodgerblue">Home Page</a>
     <a href="logout.php" class="logout-button">Logout</a>
   </header>
 
