@@ -346,6 +346,38 @@ $lowStock = $conn->query("SELECT * FROM Products WHERE quantity BETWEEN 0 AND 5 
   </form>
 </div>
 
+
+<!-- Messages Section -->
+<?php
+$messagesResult = $conn->query("SELECT * FROM Emails ORDER BY created_at DESC");
+?>
+
+<div>
+  <div class="section-title">Messages from Users</div>
+  <table>
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Message</th>
+      <th>Sent At</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php while ($msg = $messagesResult->fetch_assoc()): ?>
+      <tr>
+        <td><?= $msg['id'] ?></td>
+        <td><?= htmlspecialchars($msg['name']) ?></td>
+        <td><?= htmlspecialchars($msg['email']) ?></td>
+        <td><?= nl2br(htmlspecialchars($msg['message'])) ?></td>
+        <td><?= $msg['created_at'] ?></td>
+      </tr>
+    <?php endwhile; ?>
+    </tbody>
+  </table>
+</div>
+
 <footer class="dashboard-footer">
   &copy; <?= date("Y") ?> Inventory Tracking System. All rights reserved.
 </footer>

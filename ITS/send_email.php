@@ -1,27 +1,34 @@
 <?php
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  $to = "maleknafaa4@gmail.com";
-  $name = htmlspecialchars(trim($_POST["name"]));
-  $email = htmlspecialchars(trim($_POST["email"]));
-  $subject = htmlspecialchars(trim($_POST["subject"]));
-  $message = htmlspecialchars(trim($_POST["message"]));
+global $pdo;
+require 'db.php'; // connects using your existing db.php config
 
-  $email_subject = !empty($subject) ? $subject : "New Contact Form Message";
-  $email_body = "You received a new message from the contact form:\n\n"
-    . "Name: $name\n"
-    . "Email: $email\n"
-    . "Subject: $subject\n"
-    . "Message:\n$message";
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  // Sanitize and validate inputs
+  $name = htmlspecialchars(trim($_POST['name']));
+  $email = filter_var(trim($_POST['email']), FILTER_VALIDATE_EMAIL);
+  $subject = htmlspecialchars(trim($_POST['subject']));
+  $message = htmlspecialchars(trim($_POST['message']));
 
-  $headers = "From: $email\r\n";
-  $headers .= "Reply-To: $email\r\n";
+  if (!$name || !$email || !$message) {
+    die('Please fill out all required fields correctly.');
+  }
 
-  if (mail($to, $email_subject, $email_body, $headers)) {
-    echo "<script>alert('Message sent successfully.'); window.location.href = 'contact.html';</script>";
-  } else {
-    echo "<script>alert('Message failed to send. Please try again later.'); window.history.back();</script>";
+  try {
+    $stmt = $pdo->prepare("INSERT INTO Emails (name, email, subject, message) VALUES (:name, :email, :subject, :message)");
+    $stmt->execute([
+      ':name' => $name,
+      ':email' => $email,
+      ':subject' => $subject,
+      ':message' => $message
+    ]);
+
+    echo "Thank you! Your message has been received.";
+    // Optional: Redirect to a success page
+    // header("Location: thank_you.html");
+  } catch (PDOException $e) {
+    die("Failed to send message: " . $e->getMessage());
   }
 } else {
-  header("Location: contact.html");
-  exit();
+  die("Invalid request.");
 }
+?>
